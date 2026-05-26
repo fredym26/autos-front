@@ -17,7 +17,7 @@ const RegistrarUsuario = (props: Props) => {
   const [rol, setRol] = useState("ROLE_USER");
   const [contraseña, setContraseña] = useState("");
   const toast = useRef<Toast>(null);
-  const navigate = useNavigate(); // 👈 Hook para navegar
+  const navigate = useNavigate(); 
 
   const roles = [
     { label: "Usuario", value: "ROLE_USER" },

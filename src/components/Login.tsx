@@ -6,19 +6,21 @@ import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 
-interface LoginResponse {
+/*interface LoginResponse {
   token: string;
   idUsuario: number;
   resultado: boolean;
   notificacion: string;
-}
+}*/
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const toast = useRef<Toast>(null);    
+  const toast = useRef<Toast>(null);  
+  const navigate = useNavigate();  
   
 
   
@@ -41,8 +43,9 @@ const Login: React.FC = () => {
 
     if (resultado && token) {
       localStorage.setItem("token", token);
-      localStorage.setItem("idUsuario", idUsuario.toString());      
-      window.location.href = "/dashboard";
+      localStorage.setItem("idUsuario", idUsuario); 
+           
+      navigate("/dashboard");
     } else {        
         toast.current?.show({
           severity: "error",
@@ -56,7 +59,7 @@ const Login: React.FC = () => {
   } catch (err: any) {
     
     if (err.response && err.response.data) {
-      const { notificacion, codigo } = err.response.data;
+      const { notificacion } = err.response.data;
       toast.current?.show({
         severity: "info",
         summary: `Error`,
