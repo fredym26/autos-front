@@ -10,30 +10,30 @@ import { Toast } from "primereact/toast";
 import { useNavigate } from "react-router-dom";
 
 
-interface Auto {
-  autoId: number;
-  marca: string;
-  modelo: string;
-  anio: number;
-  numeroPlaca: string;
+interface Car {
+  carId: number;
+  brand: string;
+  model: string;
+  year: number;
+  license_plate: string;
   color: string;
-  usuarioId: number;
+  userId: number;
 }
 
 interface UsuarioResponse {
-  usuarioId: number;
-  nombre: string;
-  nombreUsuario: string;
+  userId: number;
+  fullName: string;
+  userName: string;
   email: string;
-  rol: string;
-  fechaRegistro: string;
-  autos: Auto[];
+  role: string;
+  registrationDate: string;
+  cars: Car[];
 }
 
 const Dashboard: React.FC = () => {
 
    const [usuario, setUsuario] = useState<UsuarioResponse | null>(null);
-   const [selectedAuto, setSelectedAuto] = useState<Auto | null>(null);
+   const [selectedAuto, setSelectedAuto] = useState<Car | null>(null);
    const [visible, setVisible] = useState(false);
    const [isNew, setIsNew] = useState(false);
    const [errors, setErrors] = useState<string[]>([]);
@@ -48,7 +48,7 @@ const Dashboard: React.FC = () => {
       console.log("Existe token y id" + token + " " + userId)
       axios
         .get<UsuarioResponse>(
-          `http://localhost:8080/api/autos/obtenerUsuario/${userId}`,
+          `http://localhost:8080/api/cars/findUser/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -68,20 +68,20 @@ const Dashboard: React.FC = () => {
     fetchUsuario();
   }, []);
 
-  const editarAuto = (auto: Auto) => {
+  const editarAuto = (auto: Car) => {
     setSelectedAuto({ ...auto });
     setVisible(true);
   };
 
   const nuevoAuto = () => {
     setSelectedAuto({
-      autoId: 0,
-      marca: "",
-      modelo: "",
-      anio: new Date().getFullYear(),
-      numeroPlaca: "",
+      carId: 0,
+      brand: "",
+      model: "",
+      year: new Date().getFullYear(),
+      license_plate: "",
       color: "",
-      usuarioId: Number(localStorage.getItem("idUsuario"))
+      userId: Number(localStorage.getItem("idUsuario"))
     });
     setIsNew(true);
     setVisible(true);
@@ -89,11 +89,11 @@ const Dashboard: React.FC = () => {
 
   const validar = (): boolean => {
     const errs: string[] = [];
-    if (!selectedAuto?.marca) errs.push("La marca es obligatoria");
-    if (!selectedAuto?.modelo) errs.push("El modelo es obligatorio");
-    if (!selectedAuto?.anio || selectedAuto.anio < 1900)
+    if (!selectedAuto?.brand) errs.push("La marca es obligatoria");
+    if (!selectedAuto?.model) errs.push("El modelo es obligatorio");
+    if (!selectedAuto?.year || selectedAuto.year < 1900)
       errs.push("El año debe ser válido");
-    if (!selectedAuto?.numeroPlaca) errs.push("La placa es obligatoria");
+    if (!selectedAuto?.license_plate) errs.push("La placa es obligatoria");
     if (!selectedAuto?.color) errs.push("El color es obligatorio");
 
     setErrors(errs);
@@ -104,11 +104,11 @@ const Dashboard: React.FC = () => {
     if (!selectedAuto) return;
     if (!validar()) return;
     const token = localStorage.getItem("token");
-    selectedAuto.usuarioId = Number(localStorage.getItem("idUsuario"));
+    selectedAuto.userId = Number(localStorage.getItem("idUsuario"));
     
     try {
     const response = await axios.post(
-      "http://localhost:8080/api/autos/registrarAuto",
+      "http://localhost:8080/api/cars/createCar",
       selectedAuto,
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -119,10 +119,10 @@ const Dashboard: React.FC = () => {
         if(resultado){
         // Actualizar lista local
         if (usuario) {
-          const autosActualizados = usuario.autos.map((a) =>
-            a.autoId === selectedAuto.autoId ? selectedAuto : a
+          const autosActualizados = usuario.cars.map((a) =>
+            a.carId === selectedAuto.carId ? selectedAuto : a
           );
-          setUsuario({ ...usuario, autos: autosActualizados });
+          setUsuario({ ...usuario, cars: autosActualizados });
         }
         
        toast.current?.show({
@@ -150,7 +150,7 @@ const Dashboard: React.FC = () => {
   const eliminarAuto = (id: number) => {
   const token = localStorage.getItem("token");
   axios
-    .delete(`http://localhost:8080/api/autos/eliminarAuto/${id}`, {
+    .delete(`http://localhost:8080/api/cars/deleteCar/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     .then(() => {
@@ -159,11 +159,11 @@ const Dashboard: React.FC = () => {
     .catch((error) => console.error("Error al eliminar auto:", error));
 };
 
-  const accionesTemplate = (rowData: Auto) => {
+  const accionesTemplate = (rowData: Car) => {
     return (
       <div>
         <Button onClick={() => editarAuto(rowData)} severity="warning">Editar</Button>&nbsp;
-        <Button onClick={() => eliminarAuto(rowData.autoId)} severity="danger" >Eliminar</Button>
+        <Button onClick={() => eliminarAuto(rowData.carId)} severity="danger" >Eliminar</Button>
       </div>
     );
   };
@@ -179,7 +179,7 @@ const Dashboard: React.FC = () => {
         background: "linear-gradient(135deg, #efeff4, #187e3f)",
       }}
     >
-      <h2>Bienvenido: {usuario?.nombre}</h2>      
+      <h2>Bienvenido: {usuario?.fullName}</h2>      
      <div style={{ textAlign: "left" }}>
 
       <Button
@@ -199,11 +199,11 @@ const Dashboard: React.FC = () => {
       <Toast ref={toast} />
       <div>
      
-      <DataTable value={usuario?.autos || []} paginator rows={5}>
-        <Column field="marca" header="Marca" />
-        <Column field="modelo" header="Modelo" />
-        <Column field="anio" header="Año" />
-        <Column field="numeroPlaca" header="Placa" />
+      <DataTable value={usuario?.cars || []} paginator rows={5}>
+        <Column field="brand" header="Marca" />
+        <Column field="model" header="Modelo" />
+        <Column field="year" header="Año" />
+        <Column field="license_plate" header="Placa" />
         <Column field="color" header="Color" />
         <Column  body={accionesTemplate} />
       </DataTable>
@@ -225,29 +225,29 @@ const Dashboard: React.FC = () => {
             <div className="p-field">
               <label style={{ color: "#204066", fontWeight: "bold" }} >Marca</label>
               <InputText
-                value={selectedAuto.marca}
+                value={selectedAuto.brand}
                 onChange={(e) =>
-                  setSelectedAuto({ ...selectedAuto, marca: e.target.value })
+                  setSelectedAuto({ ...selectedAuto, brand: e.target.value })
                 }
               />
             </div>
             <div className="p-field">
               <label style={{ color: "#204066", fontWeight: "bold" }} >Modelo</label>
               <InputText
-                value={selectedAuto.modelo}
+                value={selectedAuto.model}
                 onChange={(e) =>
-                  setSelectedAuto({ ...selectedAuto, modelo: e.target.value })
+                  setSelectedAuto({ ...selectedAuto, model: e.target.value })
                 }
               />
             </div>
             <div className="p-field">
               <label style={{ color: "#204066", fontWeight: "bold" }} >Año</label>
               <InputText
-                value={selectedAuto.anio}
+                value={selectedAuto.year}
                 onChange={(e) =>
                   setSelectedAuto({
                     ...selectedAuto,
-                    anio: Number(e.target.value),
+                    year: Number(e.target.value),
                   })
                 }
               />
@@ -255,11 +255,11 @@ const Dashboard: React.FC = () => {
             <div className="p-field">
               <label style={{ color: "#204066", fontWeight: "bold" }} >Placa</label>
               <InputText
-                value={selectedAuto.numeroPlaca}
+                value={selectedAuto.license_plate}
                 onChange={(e) =>
                   setSelectedAuto({
                     ...selectedAuto,
-                    numeroPlaca: e.target.value,
+                    license_plate: e.target.value,
                   })
                 }
               />

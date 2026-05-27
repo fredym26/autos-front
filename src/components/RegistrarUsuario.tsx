@@ -11,11 +11,11 @@ import { useNavigate } from "react-router-dom";
 type Props = {};
 
 const RegistrarUsuario = (props: Props) => {
-  const [nombre, setNombre] = useState("");
-  const [nombreUsuario, setNombreUsuario] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
-  const [rol, setRol] = useState("ROLE_USER");
-  const [contraseña, setContraseña] = useState("");
+  const [role, setRole] = useState("ROLE_USER");
+  const [password, setPassword] = useState("");
   const toast = useRef<Toast>(null);
   const navigate = useNavigate(); 
 
@@ -28,15 +28,15 @@ const RegistrarUsuario = (props: Props) => {
     e.preventDefault();
     try {
       const nuevoUsuario = {
-        nombre,
-        nombreUsuario,
+        fullName,
+        userName,
         email,
-        rol,
-        contraseña,
+        role,
+        password,
       };
 
       const response = await axios.post(
-        "http://localhost:8080/autenticar/guardarUsuario",
+        "http://localhost:8080/authentication/createUser",
         nuevoUsuario,
       );
 
@@ -51,11 +51,11 @@ const RegistrarUsuario = (props: Props) => {
         });
 
         // Limpieza del formulario
-        setNombre("");
-        setNombreUsuario("");
+        setFullName("");
+        setUserName("");
         setEmail("");
-        setRol("ROLE_USER");
-        setContraseña("");
+        setRole("ROLE_USER");
+        setPassword("");
       } else {
         toast.current?.show({
           severity: "error",
@@ -128,8 +128,8 @@ const RegistrarUsuario = (props: Props) => {
             </label>
             <InputText
               id="nombre"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
             />
           </div>
           <div className="field">
@@ -141,8 +141,8 @@ const RegistrarUsuario = (props: Props) => {
             </label>
             <InputText
               id="nombreUsuario"
-              value={nombreUsuario}
-              onChange={(e) => setNombreUsuario(e.target.value)}
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
             />
           </div>
           <div className="field">
@@ -167,9 +167,9 @@ const RegistrarUsuario = (props: Props) => {
             </label>
             <Dropdown
               id="rol"
-              value={rol}
+              value={role}
               options={roles}
-              onChange={(e) => setRol(e.value)}
+              onChange={(e) => setRole(e.value)}
             />
           </div>
           <div className="field">
@@ -181,8 +181,8 @@ const RegistrarUsuario = (props: Props) => {
             </label>
             <Password
               id="contraseña"
-              value={contraseña}
-              onChange={(e) => setContraseña(e.target.value)}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               feedback={false}
               toggleMask
             />

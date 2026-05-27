@@ -32,7 +32,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   try {
-    const response = await axios.post("http://localhost:8080/autenticar/login", null, {
+    const response = await axios.post("http://localhost:8080/authentication/login", null, {
       params: {
         username: username,
         password: password,
